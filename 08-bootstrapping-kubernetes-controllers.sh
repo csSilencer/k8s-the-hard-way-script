@@ -17,10 +17,10 @@ sudo mkdir -p /etc/kubernetes/config
 echo "============== Download and Install the Kubernetes Controller Binaries"
 echo "============== Download the official Kubernetes release binaries:"
 wget -q --show-progress --https-only --timestamping \
-  "https://storage.googleapis.com/kubernetes-release/release/v1.12.0/bin/linux/amd64/kube-apiserver" \
-  "https://storage.googleapis.com/kubernetes-release/release/v1.12.0/bin/linux/amd64/kube-controller-manager" \
-  "https://storage.googleapis.com/kubernetes-release/release/v1.12.0/bin/linux/amd64/kube-scheduler" \
-  "https://storage.googleapis.com/kubernetes-release/release/v1.12.0/bin/linux/amd64/kubectl"
+  "https://storage.googleapis.com/kubernetes-release/release/v1.15.3/bin/linux/amd64/kube-apiserver" \
+  "https://storage.googleapis.com/kubernetes-release/release/v1.15.3/bin/linux/amd64/kube-controller-manager" \
+  "https://storage.googleapis.com/kubernetes-release/release/v1.15.3/bin/linux/amd64/kube-scheduler" \
+  "https://storage.googleapis.com/kubernetes-release/release/v1.15.3/bin/linux/amd64/kubectl"
 
 echo "============== Install the Kubernetes binaries:"
 {
@@ -60,14 +60,13 @@ ExecStart=/usr/local/bin/kube-apiserver \\
   --authorization-mode=Node,RBAC \\
   --bind-address=0.0.0.0 \\
   --client-ca-file=/var/lib/kubernetes/ca.pem \\
-  --enable-admission-plugins=Initializers,NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota \\
-  --enable-swagger-ui=true \\
+  --enable-admission-plugins=NamespaceLifecycle,LimitRanger,ServiceAccount,TaintNodesByCondition,Priority,DefaultTolerationSeconds,DefaultStorageClass,PersistentVolumeClaimResize,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,StorageObjectInUseProtection \\
   --etcd-cafile=/var/lib/kubernetes/ca.pem \\
   --etcd-certfile=/var/lib/kubernetes/kubernetes.pem \\
   --etcd-keyfile=/var/lib/kubernetes/kubernetes-key.pem \\
   --etcd-servers=https://10.240.0.10:2379,https://10.240.0.11:2379,https://10.240.0.12:2379 \\
   --event-ttl=1h \\
-  --experimental-encryption-provider-config=/var/lib/kubernetes/encryption-config.yaml \\
+  --encryption-provider-config=/var/lib/kubernetes/encryption-config.yaml \\
   --kubelet-certificate-authority=/var/lib/kubernetes/ca.pem \\
   --kubelet-client-certificate=/var/lib/kubernetes/kubernetes.pem \\
   --kubelet-client-key=/var/lib/kubernetes/kubernetes-key.pem \\
@@ -123,7 +122,7 @@ sudo mv kube-scheduler.kubeconfig /var/lib/kubernetes/
 
 echo "============== Create the kube-scheduler.yaml configuration file:"
 cat <<EOF | sudo tee /etc/kubernetes/config/kube-scheduler.yaml
-apiVersion: componentconfig/v1alpha1
+apiVersion: kubescheduler.config.k8s.io/v1alpha1
 kind: KubeSchedulerConfiguration
 clientConnection:
   kubeconfig: "/var/lib/kubernetes/kube-scheduler.kubeconfig"
@@ -158,6 +157,7 @@ echo "============== Allow up to 10 seconds for the Kubernetes API Server to ful
 
 echo "============== Enable HTTP Health Checks"
 echo "============== Install a basic web server to handle HTTP health checks:"
+sudo apt-get update
 sudo apt-get install -y nginx
 cat > kubernetes.default.svc.cluster.local <<EOF
 server {
@@ -307,12 +307,12 @@ echo "============== The output should be like this."
 cat << EOF
 {
   "major": "1",
-  "minor": "12",
-  "gitVersion": "v1.12.0",
-  "gitCommit": "0ed33881dc4355495f623c6f22e7dd0b7632b7c0",
+  "minor": "15",
+  "gitVersion": "v1.15.3",
+  "gitCommit": "2d3c76f9091b6bec110a5e63777c332469e0cba2",
   "gitTreeState": "clean",
-  "buildDate": "2018-09-27T16:55:41Z",
-  "goVersion": "go1.10.4",
+  "buildDate": "2019-08-19T11:05:50Z",
+  "goVersion": "go1.12.9",
   "compiler": "gc",
   "platform": "linux/amd64"
 }

@@ -15,11 +15,11 @@ echo "Install the Google Cloud SDK"
 gcloud version
 
 # Set a Default Compute Region and Zone
-gcloud init
+#gcloud init
 
-gcloud config set compute/region us-west1
+#gcloud config set compute/region us-west1
 
-gcloud config set compute/zone us-west1-c
+#gcloud config set compute/zone us-west1-c
 
 echo; echo; echo
 bash ${SCRIPT_DIR}/02-client-tools.sh
